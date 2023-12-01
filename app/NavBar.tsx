@@ -86,7 +86,7 @@ const AuthStatus = () => {
   if (status === "unauthenticated")
     return (
       <Link
-        className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-1"
+        className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2"
         href="/api/auth/signin"
       >
         Login
