@@ -1,7 +1,7 @@
 # Request Management System
 Simple Request Management System build in Next.js
 
-![React-CLI](https://imgur.com/seqdurf.gif)
+![React-CLI](https://imgur.com/H2j2DSG.gif)
 
 ## Overview
 
