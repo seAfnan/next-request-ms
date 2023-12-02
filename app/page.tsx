@@ -17,12 +17,21 @@ export default async function Home() {
     where: { status: "CLOSED" },
   });
 
+  const issues = await prisma.issue.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 5,
+    // To fetch user info, this method is called Eager loading
+    include: {
+      assignToUser: true,
+    },
+  });
+
   return (
     <Grid columns={{ initial: "1", md: "2" }} gap="3">
       <Flex direction="column">
         <IssueChart open={open} inProgress={inProgress} closed={closed} />
       </Flex>
-      <LatestIssues />
+      <LatestIssues issues={issues} />
     </Grid>
   );
 }

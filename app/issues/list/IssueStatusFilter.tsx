@@ -4,7 +4,7 @@ import { Select } from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-const IssueStatusFilter = () => {
+const IssueStatusFilter = ({ selectedStatus }: { selectedStatus: string }) => {
   const statuses: { label: string; value?: Status }[] = [
     { label: "All" },
     { label: "Open", value: "OPEN" },
@@ -15,6 +15,7 @@ const IssueStatusFilter = () => {
 
   return (
     <Select.Root
+      defaultValue={selectedStatus}
       onValueChange={(status) => {
         const query = status === " " ? " " : `?status=${status}`;
         router.push("/issues/list" + query);

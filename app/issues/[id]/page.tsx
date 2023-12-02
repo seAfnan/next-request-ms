@@ -1,27 +1,16 @@
 import IssueStatusBadge from "@/app/components/IssueStatusBadge";
 import prisma from "@/prisma/client";
 import { Pencil2Icon } from "@radix-ui/react-icons";
-import {
-  AlertDialog,
-  Box,
-  Button,
-  Card,
-  Flex,
-  Grid,
-  Heading,
-  Text,
-} from "@radix-ui/themes";
+import { Box, Button, Flex, Grid, Heading, Text } from "@radix-ui/themes";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import React, { cache, useContext } from "react";
-import ReactMarkdown from "react-markdown";
 import DeleteIssueButton from "./DeleteIssueButton";
 import { getServerSession } from "next-auth";
 import authOptions from "@/app/auth/authOptions";
 import AssigneeSelect from "./AssigneeSelect";
-import { Metadata } from "next";
-import { ThemeContext } from "@/app/DarkModeContext";
 import IssueDescription from "./IssueDescription";
+import StatusSelect from "./StatusSelect";
 
 interface Props {
   params: { id: string };
@@ -54,22 +43,24 @@ const IssueDetailPage = async ({ params }: Props) => {
         <Box>
           <Flex direction="column" gap="2">
             <AssigneeSelect issue={issue} />
+            <StatusSelect issue={issue} />
             {/* <Button>
               <Pencil2Icon />
               <Link href={`/issues/edit/${issue.id}`}>Edit</Link>
             </Button> */}
-            <Link
-              href={`/issues/edit/${issue.id}`}
-              style={{ cursor: "pointer" }}
-            >
-              <div className="flex w-full">
-                <Button className="flex items-center w-full">
-                  <Pencil2Icon />
-                  Edit
-                </Button>
-              </div>
-            </Link>
-
+            {issue.status !== "CLOSED" && (
+              <Link
+                href={`/issues/edit/${issue.id}`}
+                style={{ cursor: "pointer" }}
+              >
+                <div className="flex w-full">
+                  <Button className="flex items-center w-full">
+                    <Pencil2Icon />
+                    Edit
+                  </Button>
+                </div>
+              </Link>
+            )}
             <DeleteIssueButton issueId={issue.id} />
           </Flex>
         </Box>

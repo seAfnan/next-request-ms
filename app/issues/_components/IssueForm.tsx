@@ -1,6 +1,13 @@
 "use client";
 import React, { useState } from "react";
-import { TextField, Button, Callout, Text, Heading } from "@radix-ui/themes";
+import {
+  TextField,
+  Button,
+  Callout,
+  Text,
+  Heading,
+  Select,
+} from "@radix-ui/themes";
 import "easymde/dist/easymde.min.css";
 import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
@@ -12,6 +19,8 @@ import ErrorMessage from "@/app/components/ErrorMessage";
 import Spinner from "@/app/components/Spinner";
 import { Issue } from "@prisma/client";
 import SimpleMDE from "react-simplemde-editor";
+import AssigneeSelect, { useUsersHook } from "../[id]/AssigneeSelect";
+import toast from "react-hot-toast";
 
 // If MDE show error due to its server and client component difference the use this code
 // import dynamic from "next/dynamic";
@@ -22,6 +31,7 @@ import SimpleMDE from "react-simplemde-editor";
 type IssueFormData = z.infer<typeof issueSchema>;
 
 const IssueForm = ({ issue }: { issue?: Issue }) => {
+  const { data: users, error, isLoading } = useUsersHook();
   const router = useRouter();
   const {
     register,
@@ -31,14 +41,14 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
   } = useForm<IssueFormData>({
     resolver: zodResolver(issueSchema),
   });
-  const [error, setError] = useState("");
+  const [issueError, setError] = useState("");
   const [isSubmitting, setSubmitting] = useState(false);
 
   return (
-    <div className="max-w-4xl">
-      {error && (
+    <div className="max-w-2xl">
+      {issueError && (
         <Callout.Root className="mb-2" color="red">
-          <Callout.Text>{error}</Callout.Text>
+          <Callout.Text>{issueError}</Callout.Text>
         </Callout.Root>
       )}
       <form
@@ -57,16 +67,49 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
           }
         })}
       >
-        <Heading size="3">Title</Heading>
-        <TextField.Root>
-          <TextField.Input
-            defaultValue={issue?.title}
-            placeholder="Title"
-            {...register("title")}
-          />
-        </TextField.Root>
+        <div
+          style={{
+            display: "grid",
+            ...(!issue && { gridTemplateColumns: "2fr 1fr" }),
+            gap: "16px",
+          }}
+        >
+          <div>
+            {issue && <Heading size="6">Edit</Heading>}
+            <TextField.Root>
+              <TextField.Input
+                defaultValue={issue?.title}
+                placeholder="Title"
+                {...register("title")}
+              />
+            </TextField.Root>
+          </div>
+          {!issue && (
+            <Controller
+              name="assignToUserId"
+              control={control}
+              render={({ field }) => (
+                <Select.Root
+                  onValueChange={(value: string) => field.onChange(value)}
+                >
+                  <Select.Trigger placeholder="Assign..." />
+                  <Select.Content>
+                    <Select.Group>
+                      <Select.Item value=" ">Unassigned</Select.Item>
+                      {users?.map((user) => (
+                        <Select.Item value={user.id} key={user.id}>
+                          {user.name}
+                        </Select.Item>
+                      ))}
+                    </Select.Group>
+                  </Select.Content>
+                </Select.Root>
+              )}
+            />
+          )}
+        </div>
         <ErrorMessage>{errors.title?.message}</ErrorMessage>
-        <Heading size="3">Description</Heading>
+        {/* <Heading size="3">Description</Heading> */}
         <Controller
           name="description"
           control={control}

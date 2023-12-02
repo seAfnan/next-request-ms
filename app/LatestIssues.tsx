@@ -1,18 +1,16 @@
+"use client";
 import prisma from "@/prisma/client";
 import { Avatar, Card, Flex, Heading, Link, Table } from "@radix-ui/themes";
 import NextLink from "next/link";
-import React from "react";
+import React, { useContext } from "react";
 import IssueStatusBadge from "./components/IssueStatusBadge";
+import { ThemeContext } from "./DarkModeContext";
+import { Issue } from "@prisma/client";
 
-const LatestIssues = async () => {
-  const issues = await prisma.issue.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 5,
-    // To fetch user info, this method is called Eager loading
-    include: {
-      assignToUser: true,
-    },
-  });
+const LatestIssues = ({ issues }: { issues: Issue[] }) => {
+  const context = useContext(ThemeContext);
+  const { switchDark, switchLight, theme } = context ?? {};
+
   return (
     <Card>
       <Heading style={{ color: "var(--accent-9)" }} size="5" ml="3" mb="3">
@@ -22,30 +20,26 @@ const LatestIssues = async () => {
         <Table.Body>
           {issues.map((issue) => (
             <Table.Row key={issue.id}>
-              <Table.Cell>
-                <Flex justify="between">
-                  <Flex direction="column" align="start" gap="2">
-                    <NextLink
-                      passHref
-                      legacyBehavior
-                      href={`/issues/${issue.id}`}
-                    >
+              <Table.Cell
+                className={`hover-cell ${
+                  theme === "light" ? "light-theme" : "dark-theme"
+                }`}
+              >
+                <NextLink passHref legacyBehavior href={`/issues/${issue.id}`}>
+                  <Flex justify="between">
+                    <Flex direction="column" align="start" gap="2">
                       <Link>{issue.title}</Link>
-                    </NextLink>
-
-                    {/* <NextLink href={`/issues/${issue.id}`}>
-                      {issue.title}
-                    </NextLink> */}
-                    <IssueStatusBadge status={issue.status} />
+                      <IssueStatusBadge status={issue.status} />
+                    </Flex>
+                    {issue.assignToUser && (
+                      <Avatar
+                        src={issue.assignToUser.image!}
+                        fallback="?"
+                        size="2"
+                      />
+                    )}
                   </Flex>
-                  {issue.assignToUser && (
-                    <Avatar
-                      src={issue.assignToUser.image!}
-                      fallback="?"
-                      size="2"
-                    />
-                  )}
-                </Flex>
+                </NextLink>
               </Table.Cell>
             </Table.Row>
           ))}

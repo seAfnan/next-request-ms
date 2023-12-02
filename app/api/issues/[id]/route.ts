@@ -11,8 +11,8 @@ interface Props {
 
 export async function PATCH(request: NextRequest, { params }: Props) {
   // Check if user is login
-  // const session = await getServerSession(authOptions);
-  // if (!session) return NextResponse.json({}, { status: 401 });
+  const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({}, { status: 401 });
 
   // Zod validation
   const body = await request.json();
@@ -45,6 +45,7 @@ export async function PATCH(request: NextRequest, { params }: Props) {
       title: body.title,
       description: body.description,
       assignToUserId: body.assignToUserId,
+      status: body.status,
     },
   });
 

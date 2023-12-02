@@ -1,5 +1,5 @@
 import prisma from "@/prisma/client";
-import { Link, Table } from "@radix-ui/themes";
+import { Avatar, Link, Table } from "@radix-ui/themes";
 import NextLink from "next/link";
 import IssueStatusBadge from "../../components/IssueStatusBadge";
 import IssueActions from "./IssueActions";
@@ -20,10 +20,14 @@ const IssuesPage = async ({ searchParams }: Props) => {
     where: {
       status,
     },
+    orderBy: { createdAt: "desc" },
+    include: {
+      assignToUser: true,
+    },
   });
   return (
     <div>
-      <IssueActions />
+      <IssueActions selectedStatus={searchParams.status} />
       <Table.Root variant="surface">
         <Table.Header>
           <Table.Row>
@@ -33,6 +37,9 @@ const IssuesPage = async ({ searchParams }: Props) => {
             </Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell className="hidden md:table-cell">
               Created
+            </Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell className="hidden md:table-cell">
+              Assignee
             </Table.ColumnHeaderCell>
           </Table.Row>
         </Table.Header>
@@ -54,6 +61,15 @@ const IssuesPage = async ({ searchParams }: Props) => {
               </Table.Cell>
               <Table.Cell className="hidden md:table-cell">
                 {issue.createdAt.toDateString()}
+              </Table.Cell>
+              <Table.Cell>
+                {issue.assignToUser && (
+                  <Avatar
+                    src={issue.assignToUser.image!}
+                    fallback="?"
+                    size="2"
+                  />
+                )}
               </Table.Cell>
             </Table.Row>
           ))}

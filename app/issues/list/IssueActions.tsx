@@ -5,7 +5,7 @@ import IssueStatusFilter from "./IssueStatusFilter";
 import IssueStatusBadge from "@/app/components/IssueStatusBadge";
 import prisma from "@/prisma/client";
 
-const IssueActions = async () => {
+const IssueActions = async ({ selectedStatus }: { selectedStatus: string }) => {
   const open = await prisma.issue.count({
     where: { status: "OPEN" },
   });
@@ -20,7 +20,7 @@ const IssueActions = async () => {
 
   return (
     <Flex mb="5" justify="between">
-      <IssueStatusFilter />
+      <IssueStatusFilter selectedStatus={selectedStatus} />
       <Flex gap="3">
         <Text size="1">
           <IssueStatusBadge status="OPEN" /> {open}
